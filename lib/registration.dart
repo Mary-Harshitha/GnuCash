@@ -19,7 +19,7 @@ class _RegisterState extends State<Register>{
     if(formState.validate()){
       formState.save();
       try{
-        final FirebaseUser user =
+
         await FirebaseAuth.instance.createUserWithEmailAndPassword(email: _email, password: _password);
         Navigator.push(context,MaterialPageRoute(builder: (context) => Splash()));
         _emailController.clear();
