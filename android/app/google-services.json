@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "406761258638",
+    "firebase_url": "https://gnucash-68f67.firebaseio.com",
+    "project_id": "gnucash-68f67",
+    "storage_bucket": "gnucash-68f67.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:406761258638:android:4d155d678d7775b63493df",
+        "android_client_info": {
+          "package_name": "com.example.gnu_cash"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "406761258638-d1up54olm53chap1lo55q81pb41dk8hg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4PjbOIeUW4Bx8SjUJDz7YQ3Q7tSMM38U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "406761258638-d1up54olm53chap1lo55q81pb41dk8hg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
