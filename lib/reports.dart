@@ -1,68 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gradient_app_bar/gradient_app_bar.dart';
+import 'package:flutter/animation.dart';
+import 'package:simple_animations/simple_animations.dart';
 
 class Reports extends StatefulWidget{
   _ReportState createState() => _ReportState();
 }
 
 class _ReportState extends State<Reports>{
-  Widget _buildBody(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
 
-      stream: Firestore.instance.collection('Accounts').snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData)
-          return LinearProgressIndicator();
-        else if (snapshot.hasError)
-          print('DATABASE ERROR: ${snapshot.error.toString()}');
-        return _buildData(context, snapshot.data.documents);
-      },
-    );
+  String account;
+  double amount;
+
+  @override
+  void initState(){
+    super.initState();
+    queryValues();
   }
 
-  Widget _buildData(BuildContext context, List<DocumentSnapshot> snapshot) {
-    return ListView(
-      padding: const EdgeInsets.only(top: 3.0),
-      children: snapshot.map(
-              (data) => _buildListItem(context, data)
-      ).toList(),  //executes like a foreach statement
-    );
+  void queryValues(){
+    Firestore.instance
+        .collection('Accounts')
+        .snapshots()
+        .listen((snapshot) {
+          DocumentSnapshot documentSnapshot;
+          String account1 = Record.fromSnapshot(documentSnapshot).account.toString();
+      //double tempTotal = snapshot.documents.fold(0, (tot, doc) => tot + doc.data['amount']);
+          double amount1 = Record.fromSnapshot(documentSnapshot).money;
+      setState(() {
+        account = account1;
+        amount = amount1;
+      });
+      debugPrint(account.toString());
+    });
   }
-
-  Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
-    final record = Record.fromSnapshot(data);
-  }
-
-  static var data = [
-    ClicksPerYear('2017',27, Colors.grey),
-    ClicksPerYear('2018',47, Colors.grey),
-    ClicksPerYear('2019',30, Colors.grey),
-  ];
-
-  static var series = [
-    charts.Series(
-      id: 'clicks',
-      domainFn: (ClicksPerYear clickData,_) => clickData.year,
-      measureFn:(ClicksPerYear clickData,_) => clickData.clicks ,
-      data: data,
-      colorFn: (ClicksPerYear clickData,_) => clickData.color,
-    ),
-  ];
-
-  static var chart = charts.BarChart(
-    series,
-    animate: true,
-  );
-
-  Widget chartWidget = Padding(
-    padding: EdgeInsets.all(32.0),
-    child: SizedBox(
-      height: 180.0,
-      child: chart,
-    ),
-  );
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +128,7 @@ class _ReportState extends State<Reports>{
                           Card(
                             color: Colors.white,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                            child: chartWidget,
+                            child: BarChartApplication(account,amount),
                           )
                         ],)
                     )
@@ -198,15 +170,72 @@ class _ReportState extends State<Reports>{
   }
 }
 
-class ClicksPerYear {
-  final String year;
-  final int clicks;
-  final charts.Color color;
+class Bar extends StatelessWidget {
+  final double height;
+  final String label;
 
-  ClicksPerYear(this.year, this.clicks, Color color) :
-        this.color = charts.Color(
-            r: color.red, g: color.green, b: color.blue, a: color.alpha);
+  final int _baseDurationMs = 1000;
+  final double _maxElementHeight = 100;
+
+  Bar(this.height, this.label);
+
+  @override
+  Widget build(BuildContext context) {
+    return ControlledAnimation(
+      duration: Duration(milliseconds: (height * _baseDurationMs).round()),
+      tween: Tween(begin: 0.0, end: height),
+      builder: (context, animatedHeight) {
+        return Column(
+          children: <Widget>[
+            SizedBox(height: 50,),
+            Container(
+              height: (1 - animatedHeight) * _maxElementHeight,
+            ),
+            Container(
+              width: 20,
+              height: animatedHeight * _maxElementHeight,
+              color: Colors.blue,
+            ),
+            Text(label,style: TextStyle(
+                fontSize: 12,color: Colors.purple
+            ),)
+          ],
+        );
+      },
+    );
+  }
 }
+
+class BarChartApplication extends StatelessWidget {
+  String account;
+  double money;
+  BarChartApplication(this.account, this.money);
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          Bar(0.3, "2013"),
+RaisedButton(onPressed:(){
+  print(account);
+  print('$money');
+},child: Text('Press'),)
+//          Bar(0.5, "2014"),
+//          Bar(0.7, "2015"),
+//          Bar(0.8, "2016"),
+//          Bar(0.9, "2017"),
+//          Bar(0.98, "2018"),
+//          Bar(0.84, "2019"),
+        ],
+      ),
+    );
+  }
+}
+
 
 class Record {
   String account;
