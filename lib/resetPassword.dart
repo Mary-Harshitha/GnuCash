@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'splashScreen.dart';
 import 'dart:async';
 
 class Reset extends StatefulWidget{
