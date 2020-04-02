@@ -72,8 +72,7 @@ class _AddStatePage extends State<AddAccount>{
             color: Colors.white,fontSize: 20
           ),),color: Colors.pink,
               onPressed: (){
-            if(_formKey.currentState.validate())
-            {
+            if(_formKey.currentState.validate()){
               Firestore.instance.collection('Accounts').add({
                 'account_type' : holder,
                 'money' : double.parse(_amountController.text),
