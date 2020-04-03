@@ -68,8 +68,6 @@ class _MyHomePageState extends State<Home>{
     return loginBtn;
   }
 
-  String _key = '_drawer';
-
   void _signOut() async{
     await FirebaseAuth.instance.signOut();
     runApp(
@@ -155,7 +153,6 @@ class _MyHomePageState extends State<Home>{
           ),
 
           drawer: Drawer(
-            key: Key(_key),
             child: ListView(
               padding: EdgeInsets.zero,
               children: <Widget>[
