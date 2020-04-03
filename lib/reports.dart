@@ -10,30 +10,40 @@ class Reports extends StatefulWidget{
 
 class _ReportState extends State<Reports>{
 
-  String account;
-  double amount;
+  Widget _buildBody(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
 
-  @override
-  void initState(){
-    super.initState();
-    queryValues();
+      stream: Firestore.instance.collection('Accounts').snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData)
+          return LinearProgressIndicator();
+        else if (snapshot.hasError)
+          print('DATABASE ERROR: ${snapshot.error.toString()}');
+        return _buildList(context, snapshot.data.documents);
+      },
+    );
   }
 
-  void queryValues(){
-    Firestore.instance
-        .collection('Accounts')
-        .snapshots()
-        .listen((snapshot) {
-          DocumentSnapshot documentSnapshot;
-          String account1 = Record.fromSnapshot(documentSnapshot).account.toString();
-      //double tempTotal = snapshot.documents.fold(0, (tot, doc) => tot + doc.data['amount']);
-          double amount1 = Record.fromSnapshot(documentSnapshot).money;
-      setState(() {
-        account = account1;
-        amount = amount1;
-      });
-      debugPrint(account.toString());
-    });
+  Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
+    return ListView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.only(top: 3.0),
+      children: snapshot.map(
+              (data) => _buildListItem(context, data)
+      ).toList(),  //executes like a foreach statement
+    );
+  }
+
+  Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
+    final record = Record.fromSnapshot(data);
+
+    return Padding(
+        key: ValueKey(record.account),
+        padding: EdgeInsets.symmetric(vertical: 2,horizontal: 0),
+        child: Container(
+    height: 90,
+    child: BarChartApplication(record.account.toString(), record.money),
+    ));
   }
 
   @override
@@ -62,7 +72,9 @@ class _ReportState extends State<Reports>{
       ),
       body: Builder(
           builder: (BuildContext reportContext){
-            return Column(
+            return SingleChildScrollView(
+              padding: EdgeInsets.symmetric(vertical: 10),
+              child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 ButtonBar(buttonMinWidth: 190.0,
@@ -121,48 +133,22 @@ class _ReportState extends State<Reports>{
                         child:Column(children: <Widget>[
                           Align(
                             alignment: Alignment.bottomLeft,
-                            child:Text('Expenses for last 3 months',
+                            child:Text('All Transactions',
                               style: TextStyle(
                                 fontWeight: FontWeight.w300,fontSize: 18,
                               ),),),
-                          Card(
-                            color: Colors.white,
+                          SizedBox(height: 10),
+                          Expanded(
+                          child:Card(
+                            color: Colors.black,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                            child: BarChartApplication(account,amount),
-                          )
+                            child: _buildBody(context),
+                          ))
                         ],)
                     )
                 ),
-
-                Container(
-                    height: 200,
-                    child:Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Card(
-                        color: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                        child: Column(
-                          children: <Widget>[
-                            ListTile(
-                              title: Text('Total Assets'),
-                              trailing: Text('0.00'),
-                            ),
-                            ListTile(
-                              title: Text('Total Liabilities'),
-                              trailing: Text('0.00'),
-                            ),
-                            ListTile(
-                              title: Text('Net Worth'),
-                              trailing: Text('0.00'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                )
-
               ],
-            );
+            ));
           }
       ),
 
@@ -173,11 +159,12 @@ class _ReportState extends State<Reports>{
 class Bar extends StatelessWidget {
   final double height;
   final String label;
+  final String amount;
 
   final int _baseDurationMs = 1000;
   final double _maxElementHeight = 100;
 
-  Bar(this.height, this.label);
+  Bar(this.height, this.label,this.amount);
 
   @override
   Widget build(BuildContext context) {
@@ -187,17 +174,33 @@ class Bar extends StatelessWidget {
       builder: (context, animatedHeight) {
         return Column(
           children: <Widget>[
-            SizedBox(height: 50,),
+            SizedBox(height: 50),
             Container(
               height: (1 - animatedHeight) * _maxElementHeight,
             ),
+            Text('$amount',style: TextStyle(
+              fontSize: 12,color: Colors.yellow
+            ),),
             Container(
-              width: 20,
+              width: 30,
               height: animatedHeight * _maxElementHeight,
-              color: Colors.blue,
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.topRight,
+                      end: Alignment.bottomLeft,
+                      stops: [0.1,0.2, 0.5, 0.6, 0.9],
+                      colors: [
+                        Colors.purple,
+                        Colors.purple,
+                        Colors.indigo,
+                        Colors.indigo,
+                        Colors.pink
+                      ])
+              ),
             ),
+            SizedBox(height: 5,),
             Text(label,style: TextStyle(
-                fontSize: 12,color: Colors.purple
+                fontSize: 16,color: Colors.white
             ),)
           ],
         );
@@ -207,10 +210,11 @@ class Bar extends StatelessWidget {
 }
 
 class BarChartApplication extends StatelessWidget {
-  String account;
-  double money;
+  final String account;
+  final double money;
+  final double hh = 100.0;
+  final double tt = 1000.0;
   BarChartApplication(this.account, this.money);
-
 
   @override
   Widget build(BuildContext context) {
@@ -219,23 +223,12 @@ class BarChartApplication extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          Bar(0.3, "2013"),
-RaisedButton(onPressed:(){
-  print(account);
-  print('$money');
-},child: Text('Press'),)
-//          Bar(0.5, "2014"),
-//          Bar(0.7, "2015"),
-//          Bar(0.8, "2016"),
-//          Bar(0.9, "2017"),
-//          Bar(0.98, "2018"),
-//          Bar(0.84, "2019"),
+          Bar((money)>100?(money)/tt:(money)/hh, account,money.toString()),
         ],
       ),
     );
   }
 }
-
 
 class Record {
   String account;
