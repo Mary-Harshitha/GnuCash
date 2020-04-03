@@ -21,9 +21,6 @@ class _MyHomePageState extends State<Home>{
   FirebaseUser user;
   _MyHomePageState(this.user);
 
-  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-
   Future<bool> _onBackPressed() {
     return showDialog(
       context: context,
