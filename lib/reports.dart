@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gradient_app_bar/gradient_app_bar.dart';
+import 'package:flutter/animation.dart';
+import 'package:simple_animations/simple_animations.dart';
 
 class Reports extends StatefulWidget{
   _ReportState createState() => _ReportState();
 }
 
 class _ReportState extends State<Reports>{
+
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
 
@@ -17,13 +19,14 @@ class _ReportState extends State<Reports>{
           return LinearProgressIndicator();
         else if (snapshot.hasError)
           print('DATABASE ERROR: ${snapshot.error.toString()}');
-        return _buildData(context, snapshot.data.documents);
+        return _buildList(context, snapshot.data.documents);
       },
     );
   }
 
-  Widget _buildData(BuildContext context, List<DocumentSnapshot> snapshot) {
+  Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
     return ListView(
+      scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.only(top: 3.0),
       children: snapshot.map(
               (data) => _buildListItem(context, data)
@@ -33,36 +36,15 @@ class _ReportState extends State<Reports>{
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
     final record = Record.fromSnapshot(data);
+
+    return Padding(
+        key: ValueKey(record.account),
+        padding: EdgeInsets.symmetric(vertical: 2,horizontal: 0),
+        child: Container(
+    height: 90,
+    child: BarChartApplication(record.account.toString(), record.money),
+    ));
   }
-
-  static var data = [
-    ClicksPerYear('2017',27, Colors.grey),
-    ClicksPerYear('2018',47, Colors.grey),
-    ClicksPerYear('2019',30, Colors.grey),
-  ];
-
-  static var series = [
-    charts.Series(
-      id: 'clicks',
-      domainFn: (ClicksPerYear clickData,_) => clickData.year,
-      measureFn:(ClicksPerYear clickData,_) => clickData.clicks ,
-      data: data,
-      colorFn: (ClicksPerYear clickData,_) => clickData.color,
-    ),
-  ];
-
-  static var chart = charts.BarChart(
-    series,
-    animate: true,
-  );
-
-  Widget chartWidget = Padding(
-    padding: EdgeInsets.all(32.0),
-    child: SizedBox(
-      height: 180.0,
-      child: chart,
-    ),
-  );
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +72,9 @@ class _ReportState extends State<Reports>{
       ),
       body: Builder(
           builder: (BuildContext reportContext){
-            return Column(
+            return SingleChildScrollView(
+              padding: EdgeInsets.symmetric(vertical: 10),
+              child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 ButtonBar(buttonMinWidth: 190.0,
@@ -149,48 +133,22 @@ class _ReportState extends State<Reports>{
                         child:Column(children: <Widget>[
                           Align(
                             alignment: Alignment.bottomLeft,
-                            child:Text('Expenses for last 3 months',
+                            child:Text('All Transactions',
                               style: TextStyle(
                                 fontWeight: FontWeight.w300,fontSize: 18,
                               ),),),
-                          Card(
-                            color: Colors.white,
+                          SizedBox(height: 10),
+                          Expanded(
+                          child:Card(
+                            color: Colors.black,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                            child: chartWidget,
-                          )
+                            child: _buildBody(context),
+                          ))
                         ],)
                     )
                 ),
-
-                Container(
-                    height: 200,
-                    child:Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Card(
-                        color: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                        child: Column(
-                          children: <Widget>[
-                            ListTile(
-                              title: Text('Total Assets'),
-                              trailing: Text('0.00'),
-                            ),
-                            ListTile(
-                              title: Text('Total Liabilities'),
-                              trailing: Text('0.00'),
-                            ),
-                            ListTile(
-                              title: Text('Net Worth'),
-                              trailing: Text('0.00'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                )
-
               ],
-            );
+            ));
           }
       ),
 
@@ -198,14 +156,78 @@ class _ReportState extends State<Reports>{
   }
 }
 
-class ClicksPerYear {
-  final String year;
-  final int clicks;
-  final charts.Color color;
+class Bar extends StatelessWidget {
+  final double height;
+  final String label;
+  final String amount;
 
-  ClicksPerYear(this.year, this.clicks, Color color) :
-        this.color = charts.Color(
-            r: color.red, g: color.green, b: color.blue, a: color.alpha);
+  final int _baseDurationMs = 1000;
+  final double _maxElementHeight = 100;
+
+  Bar(this.height, this.label,this.amount);
+
+  @override
+  Widget build(BuildContext context) {
+    return ControlledAnimation(
+      duration: Duration(milliseconds: (height * _baseDurationMs).round()),
+      tween: Tween(begin: 0.0, end: height),
+      builder: (context, animatedHeight) {
+        return Column(
+          children: <Widget>[
+            SizedBox(height: 50),
+            Container(
+              height: (1 - animatedHeight) * _maxElementHeight,
+            ),
+            Text('$amount',style: TextStyle(
+              fontSize: 12,color: Colors.yellow
+            ),),
+            Container(
+              width: 30,
+              height: animatedHeight * _maxElementHeight,
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.topRight,
+                      end: Alignment.bottomLeft,
+                      stops: [0.1,0.2, 0.5, 0.6, 0.9],
+                      colors: [
+                        Colors.purple,
+                        Colors.purple,
+                        Colors.indigo,
+                        Colors.indigo,
+                        Colors.pink
+                      ])
+              ),
+            ),
+            SizedBox(height: 5,),
+            Text(label,style: TextStyle(
+                fontSize: 16,color: Colors.white
+            ),)
+          ],
+        );
+      },
+    );
+  }
+}
+
+class BarChartApplication extends StatelessWidget {
+  final String account;
+  final double money;
+  final double hh = 100.0;
+  final double tt = 1000.0;
+  BarChartApplication(this.account, this.money);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          Bar((money)>100?(money)/tt:(money)/hh, account,money.toString()),
+        ],
+      ),
+    );
+  }
 }
 
 class Record {

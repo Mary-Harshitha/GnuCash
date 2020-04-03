@@ -75,8 +75,8 @@ class _SplashState extends State<Splash>{
             children: <Widget>[
               SizedBox(height: 150),
               Text('GnuCash',style: TextStyle(
-                fontSize: 54,decorationStyle: TextDecorationStyle.wavy,
-                  fontFamily: 'segoe print',fontStyle: FontStyle.italic,
+                fontSize: 50,decorationStyle: TextDecorationStyle.wavy,
+                  fontFamily: 'segoe print',
                   color: Colors.white
               ),),
             SizedBox(height: 20,),
