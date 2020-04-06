@@ -68,8 +68,8 @@ class _EditStatePage extends State<EditAccount>{
                 color: Colors.white,fontSize: 20
             ),),color: Colors.orange,
                 onPressed: (){
-                  Firestore.instance.collection('Accounts').document(id).
-                  updateData({"account_type" : _accountnameController.text});
+                  Firestore.instance.collection(name).document(id).
+                  updateData({"account" : _accountnameController.text});
                   Navigator.pop(context);
                 }),
           )
