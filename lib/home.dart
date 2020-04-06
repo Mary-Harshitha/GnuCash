@@ -127,10 +127,10 @@ class _MyHomePageState extends State<Home>{
               ),
 
               StreamBuilder<QuerySnapshot>(
-              stream: Firestore.instance.collection('Accounts').snapshots(),
+              stream: Firestore.instance.collection(user.email).snapshots(),
               builder: (context, snapshot) {
               // ignore: missing_return
-              return snapshot.hasData?Accounts():Text('No accounts',textAlign: TextAlign.center,
+              return snapshot.hasData?Accounts(user.email):Text('No accounts',textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.indigoAccent,
                   fontSize: 20,
@@ -139,10 +139,10 @@ class _MyHomePageState extends State<Home>{
               }),
 
               StreamBuilder<QuerySnapshot>(
-                  stream: Firestore.instance.collection('Accounts').snapshots(),
+                  stream: Firestore.instance.collection(user.email).snapshots(),
                   builder: (context, snapshot) {
                     // ignore: missing_return
-                    return snapshot.hasData?Favourites():Text('No Favourite accounts',textAlign: TextAlign.center,
+                    return snapshot.hasData?Favourites(user.email):Text('No Favourite accounts',textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.indigoAccent,
                         fontSize: 20,
@@ -220,7 +220,8 @@ class _MyHomePageState extends State<Home>{
                   )),
                 ],),
                   onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => Reports(),fullscreenDialog: true));
+                    Navigator.push(context, MaterialPageRoute(builder:
+                        (context) => Reports(user.email),fullscreenDialog: true));
                   },
                 ),
                 Divider(
@@ -313,7 +314,7 @@ class _MyHomePageState extends State<Home>{
               onPressed:
                   (){
                 Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => AddAccount(),fullscreenDialog: true));
+                    builder: (context) => AddAccount(user.email.toString()),fullscreenDialog: true));
               }
           ),
         ),
