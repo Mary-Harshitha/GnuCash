@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'splashScreen.dart';
 import 'dart:async';
 
@@ -10,8 +11,9 @@ class Register extends StatefulWidget{
 class _RegisterState extends State<Register>{
 
   final _emailController = TextEditingController();
+  final _nameController = TextEditingController();
   final _passwordController = TextEditingController();
-  String _email, _password;
+  String _email, _password, _username;
   GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
 
   Future<void> signIn() async {
@@ -19,11 +21,21 @@ class _RegisterState extends State<Register>{
     if(formState.validate()){
       formState.save();
       try{
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _email, password: _password);
 
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(email: _email, password: _password);
+        Firestore.instance.collection('Users').add(
+            {
+              'username': _username,
+              'email': _email,
+              'password': _password,
+            }
+        );
+
         Navigator.push(context,MaterialPageRoute(builder: (context) => Splash()));
         _emailController.clear();
         _passwordController.clear();
+
       }catch(e)
       {
         showDialog(context: context,
@@ -51,7 +63,7 @@ class _RegisterState extends State<Register>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Registration'),backgroundColor: Colors.black,),
+      appBar: AppBar(title: Text('Registration'),backgroundColor: Colors.indigo,),
       body: Builder(
         builder: (BuildContext splashContext){
           return Container(
@@ -63,11 +75,11 @@ class _RegisterState extends State<Register>{
                       end: Alignment.bottomLeft,
                       stops: [0.1,0.2, 0.5, 0.6, 0.9],
                       colors: [
-                        Colors.black,
-                        Colors.black,
-                        Colors.grey,
-                        Colors.black,
-                        Colors.grey
+                        Colors.indigo,
+                        Colors.indigo,
+                        Colors.cyan,
+                        Colors.indigo,
+                        Colors.cyan
                       ])
               ),
               child:Column(
@@ -80,6 +92,24 @@ class _RegisterState extends State<Register>{
                             padding: EdgeInsets.symmetric(horizontal: 20),
                             child:Column(
                               children: <Widget>[
+                                TextFormField(
+                                  controller: _nameController,
+                                  keyboardType: TextInputType.text,
+                                  autocorrect: false,
+                                  decoration: InputDecoration(
+                                      filled: true,
+                                      labelText: 'Username',
+                                      labelStyle: TextStyle(
+                                          color: Colors.white
+                                      )
+                                  ),
+                                  validator: (input){ // ignore: missing_return
+                                    if(input.isEmpty){
+                                      return "Please enter your name";
+                                    }
+                                  },
+                                  onSaved: (input) => _username = input,
+                                ),
                                 TextFormField(
                                   controller: _emailController,
                                   keyboardType: TextInputType.emailAddress,
@@ -133,8 +163,8 @@ class _RegisterState extends State<Register>{
                                             decoration: const BoxDecoration(
                                               gradient: LinearGradient(
                                                 colors: [
-                                                  Colors.black,Colors.grey,
-                                                  Colors.black,Colors.black
+                                                  Colors.indigo,Colors.cyan,
+                                                  Colors.indigo,Colors.indigo
                                                 ],
                                               ),
                                             ),
@@ -144,7 +174,43 @@ class _RegisterState extends State<Register>{
                                                 style: TextStyle(fontSize: 16,fontWeight: FontWeight.w400)
                                             ),
                                           ),)
-                                    ))],
+                                    )),
+//                                ConstrainedBox(
+//                                    constraints: const BoxConstraints(minWidth: double.infinity,minHeight: 50),
+//                                    child:RaisedButton(
+//                                        onPressed: (){
+//                                          Firestore.instance
+//                                            .collection("Users")
+//                                            .getDocuments()
+//                                            .then((QuerySnapshot snapshot)
+//                                        {
+//                                          snapshot.documents.forEach((f) =>
+//                                              print('${f.data}}'));
+//                                        });
+//                                        },
+//                                        padding: const EdgeInsets.all(0.0),
+//                                        textColor: Colors.white,
+//                                        child:ConstrainedBox(
+//                                          constraints: const BoxConstraints(
+//                                              minWidth: double.infinity,minHeight: 50),
+//                                          child:Container(
+//                                            decoration: const BoxDecoration(
+//                                              gradient: LinearGradient(
+//                                                colors: [
+//                                                  Colors.indigo,Colors.cyan,
+//                                                  Colors.indigo,Colors.indigo
+//                                                ],
+//                                              ),
+//                                            ),
+//                                            padding: const EdgeInsets.all(10.0),
+//                                            child: const Text(
+//                                                'Show',textAlign: TextAlign.center,
+//                                                style: TextStyle(fontSize: 16,fontWeight: FontWeight.w400)
+//                                            ),
+//                                          ),)
+//                                    )),
+
+                              ],
                             ),)
                       )
                   )
