@@ -5,21 +5,33 @@ import 'newTransaction.dart';
 import 'showTransactions.dart';
 
 class Favourites extends StatelessWidget {
+  String userAddress;
+
+  Favourites(this.userAddress);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: AllFavourites(),
+      body: AllFavourites(userAddress),
     );
   }
 }
 
 class AllFavourites extends StatefulWidget {
+  String userAddress;
+
+  AllFavourites(this.userAddress);
+
   @override
-  _FavPageState createState() => _FavPageState();
+  _FavPageState createState() => _FavPageState(userAddress);
 
 }
 
 class _FavPageState extends State<AllFavourites> {
+  String userAddress;
+
+  _FavPageState(this.userAddress);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +42,7 @@ class _FavPageState extends State<AllFavourites> {
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
 
-      stream: Firestore.instance.collection('Accounts').snapshots(),
+      stream: Firestore.instance.collection(userAddress).snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData)
           return LinearProgressIndicator();
@@ -59,7 +71,7 @@ class _FavPageState extends State<AllFavourites> {
           decoration: BoxDecoration(
               border: Border(
                   left: BorderSide(
-                      color: Colors.indigoAccent,width: 4.0
+                      color: Colors.pinkAccent,width: 4.0
                   )
               )
           ),
@@ -82,7 +94,7 @@ class _FavPageState extends State<AllFavourites> {
                             child: (!record.favourite)?
                             Icon(Icons.star_border):Icon(Icons.star,color: Colors.black,),
                             onTap: (){
-                              Firestore.instance.collection('Accounts').document(record.reference.documentID).
+                              Firestore.instance.collection(userAddress).document(record.reference.documentID).
                               updateData({"fav" : !record.favourite});
                             },
                           )
@@ -98,7 +110,7 @@ class _FavPageState extends State<AllFavourites> {
 
                             InkWell(child: Icon(Icons.add),onTap: (){
                               Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) => Transact(
+                                  MaterialPageRoute(builder: (context) => Transact(userAddress,
                                       data.documentID,record.money.toDouble(),record.account),fullscreenDialog: true));
                             },),
 
@@ -141,7 +153,7 @@ class _FavPageState extends State<AllFavourites> {
                                                 onPressed: () async {
                                                   Navigator.pop(context);
                                                   await Firestore.instance
-                                                      .collection('Accounts')
+                                                      .collection(userAddress)
                                                       .document(data.documentID)
                                                       .delete();
                                                 },
@@ -154,7 +166,8 @@ class _FavPageState extends State<AllFavourites> {
                                       );
                                     }):
                                 Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) => EditAccount(record.account.toString(),data.documentID),fullscreenDialog: true));
+                                    MaterialPageRoute(builder: (context) => EditAccount(
+                                        record.account.toString(),data.documentID),fullscreenDialog: true));
                               },
                             ),
                           ],
@@ -167,8 +180,17 @@ class _FavPageState extends State<AllFavourites> {
                 subtitle: Text('${(record.accountType)}'),
 
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => AllTransactions(record.account),
-                      fullscreenDialog: true));
+                  showDialog(
+                      context: context,
+                      builder:  (BuildContext context) {
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)
+                          ),
+                          title: Text('Transactions'),
+                          content: AllTransactions(userAddress, data.documentID),
+                        );
+                      });
                 }
             ),
           ),
