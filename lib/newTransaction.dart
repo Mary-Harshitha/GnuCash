@@ -4,19 +4,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 // ignore: must_be_immutable
 class Transact extends StatefulWidget{
+  String userAddress;
   String docId;
   String account;
   double amt;
-  Transact(this.docId,this.amt,this.account);
+  Transact(this.userAddress,this.docId,this.amt,this.account);
 
-  _TransactState createState() => _TransactState(docId,amt,account);
+  _TransactState createState() => _TransactState(userAddress,docId,amt,account);
 }
 
 class _TransactState extends State<Transact>{
+  String userAddress;
   String id;
   String account;
   double amt;
-  _TransactState(this.id,this.amt,this.account);
+  _TransactState(this.userAddress,this.id,this.amt,this.account);
 
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _descController = TextEditingController();
@@ -46,23 +48,23 @@ class _TransactState extends State<Transact>{
                 onPressed: (){
                   if(_formKey.currentState.validate())
                   {
-
                     (status != 'Spend')?transact = double.parse(_amtController.text):
                     transact= -(double.parse(_amtController.text));
-
                     nValue = amt + (transact);
-
-                    Firestore.instance.collection('Accounts').document(id).
+                    Firestore.instance.collection(userAddress).document(id).
                     updateData({"money" : nValue});
 
-                    Firestore.instance.collection('Transactions').add({
-                      'description' : _descController.text,
-                      'amount' : transact,
-                      'date': dt,
-                      'account': account,
-                    }
+                    Firestore.instance.collection(userAddress).document(id).collection(userAddress).document().setData(
+                      {
+                        'description' : _descController.text,
+                        'amount' : transact,
+                        'date': dt,
+                      }
                     );
+//                    add({
 
+//                    }
+//                    );
                     Navigator.pop(context);
                   }
                 }
