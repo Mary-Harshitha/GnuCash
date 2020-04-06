@@ -4,10 +4,18 @@ import 'package:gradient_app_bar/gradient_app_bar.dart';
 import 'parentAccount.dart';
 
 class AddAccount extends StatefulWidget{
-  _AddStatePage createState() => _AddStatePage();
+  String userAddress;
+
+  AddAccount(this.userAddress);
+
+  _AddStatePage createState() => _AddStatePage(userAddress);
 }
 
 class _AddStatePage extends State<AddAccount>{
+  String userAddress;
+
+
+  _AddStatePage(this.userAddress);
 
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _accountNameController = TextEditingController();
@@ -73,7 +81,7 @@ class _AddStatePage extends State<AddAccount>{
           ),),color: Colors.pink,
               onPressed: (){
             if(_formKey.currentState.validate()){
-              Firestore.instance.collection('Accounts').add({
+              Firestore.instance.collection(userAddress).add({
                 'account_type' : holder,
                 'money' : double.parse(_amountController.text),
                 'fav': false,

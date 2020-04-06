@@ -3,42 +3,30 @@ import 'package:flutter/material.dart';
 import 'package:gradient_app_bar/gradient_app_bar.dart';
 
 // ignore: must_be_immutable
-class ShowTransactions extends StatelessWidget {
-  String account;
-
-  ShowTransactions(this.account);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: AllTransactions(account),
-    );
-  }
-}
-
-// ignore: must_be_immutable
 class AllTransactions extends StatefulWidget {
-  String account;
-  AllTransactions(this.account);
+  String userAddress;
+  String docId;
+  AllTransactions(this.userAddress,this.docId);
 
   @override
-  _TransactionPageState createState() => _TransactionPageState(account);
+  _TransactionPageState createState() => _TransactionPageState(userAddress,docId);
 }
 
 class _TransactionPageState extends State<AllTransactions> {
-  String account;
-  _TransactionPageState(this.account);
+  String userAddress;
+  String docId;
+  _TransactionPageState(this.userAddress,this.docId);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: GradientAppBar(
-        title: Text('Transactions'),
-        gradient: LinearGradient(
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-            colors: [Colors.indigo,Colors.purple]),
-      ),
+//      appBar: GradientAppBar(
+//        title: Text('Transactions'),
+//        gradient: LinearGradient(
+//            begin: Alignment.centerLeft,
+//            end: Alignment.centerRight,
+//            colors: [Colors.indigo,Colors.purple]),
+//      ),
       body: _buildBody(context),
     );
   }
@@ -46,7 +34,8 @@ class _TransactionPageState extends State<AllTransactions> {
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
 
-      stream: Firestore.instance.collection('Transactions').snapshots(),
+      stream: Firestore.instance.collection(userAddress).
+      document(docId).collection(userAddress).snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData)
           return LinearProgressIndicator();
@@ -70,28 +59,14 @@ class _TransactionPageState extends State<AllTransactions> {
     final record = Record.fromSnapshot(data);
 
     return Padding(
-      key: ValueKey(record.accName),
-      padding: EdgeInsets.symmetric(vertical: 0,horizontal: 3),
-      child: Container(
-          decoration: BoxDecoration(
-              border: Border(
-                  left: BorderSide(
-                      color: Colors.indigoAccent,width: 4.0
-                  )
-              )
-          ),
-          height: 90,
-          child: Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-            color: Colors.white,
-            child: ListTile(
-
-                title: Text('${(record.accName == account)?record.description:''}',style: TextStyle(
+      key: ValueKey(record.amount),
+      padding: EdgeInsets.symmetric(vertical: 0,horizontal: 1),
+      child: ListTile(
+                title: Text('${record.description}',style: TextStyle(
                     fontSize: 20
                 ),),
                 trailing: Container(
-                  width: 150,
+                  width: 50,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
@@ -100,25 +75,23 @@ class _TransactionPageState extends State<AllTransactions> {
                         child:Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Text('${(record.accName == account)?record.amount.toStringAsFixed(2):''}',textAlign: TextAlign.left,),
+                            Text('${record.amount.toStringAsFixed(2)}',textAlign: TextAlign.left,),
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-                subtitle: Text('${(record.accName == account)?record.date.toDate():''}'),
+                subtitle: Text('${record.date.toDate()}'),
                 onTap: () {
                 }
             ),
-          )
-      ),
+
     );
   }
 }
 
 class Record {
-  String accName;
   double amount;
   String description;
   Timestamp date;
@@ -127,10 +100,8 @@ class Record {
   Record.fromMap(Map<String, dynamic> map, {this.reference})
       : assert(map['amount'] != null), //make sure data isn't null, assert is for that
         assert(map['description'] != null),
-        assert(map['account'] != null),
         assert(map['date'] != null),
         amount = map['amount'],
-        accName = map['account'],
         description = map['description'],
         date = map['date'];
 

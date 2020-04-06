@@ -5,21 +5,32 @@ import 'newTransaction.dart';
 import 'showTransactions.dart';
 
 class Accounts extends StatelessWidget {
+  String userAddress;
+  Accounts(this.userAddress);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: AllAccounts(),
+      body: AllAccounts(userAddress),
     );
   }
 }
 
 class AllAccounts extends StatefulWidget {
+  String userAddress;
+
+  AllAccounts(this.userAddress);
+
   @override
-  _AccountsPageState createState() => _AccountsPageState();
+  _AccountsPageState createState() => _AccountsPageState(userAddress);
 
 }
 
 class _AccountsPageState extends State<AllAccounts> {
+  String userAddress;
+
+  _AccountsPageState(this.userAddress);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,9 +39,11 @@ class _AccountsPageState extends State<AllAccounts> {
   }
 
   Widget _buildBody(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
 
-      stream: Firestore.instance.collection('Accounts').snapshots(),
+    return StreamBuilder<QuerySnapshot>(
+//Firestore.instance.collection('Users').document(DocumentReference).collection('allAccounts').snapshots()
+
+      stream: Firestore.instance.collection(userAddress).snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData)
           return LinearProgressIndicator();
@@ -60,7 +73,7 @@ class _AccountsPageState extends State<AllAccounts> {
         decoration: BoxDecoration(
           border: Border(
             left: BorderSide(
-              color: Colors.indigoAccent,width: 4.0
+              color: Colors.pinkAccent,width: 4.0
             )
           )
         ),
@@ -83,7 +96,7 @@ class _AccountsPageState extends State<AllAccounts> {
                       child: (!record.favourite)?
                       Icon(Icons.star_border):Icon(Icons.star,color: Colors.black,),
                       onTap: (){
-                        Firestore.instance.collection('Accounts').document(record.reference.documentID).
+                        Firestore.instance.collection(userAddress).document(record.reference.documentID).
                         updateData({"fav" : !record.favourite});
                       },
                     )
@@ -99,7 +112,7 @@ class _AccountsPageState extends State<AllAccounts> {
 
                         InkWell(child: Icon(Icons.add),onTap: (){
                           Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => Transact(
+                              MaterialPageRoute(builder: (context) => Transact(userAddress,
                                   data.documentID,record.money.toDouble(),record.account)
                                   ,fullscreenDialog: true));
                         },),
@@ -143,7 +156,7 @@ class _AccountsPageState extends State<AllAccounts> {
                                             onPressed: () async {
                                               Navigator.pop(context);
                                               await Firestore.instance
-                                                  .collection('Accounts')
+                                                  .collection(userAddress)
                                                   .document(data.documentID)
                                                   .delete();
                                             },
@@ -156,7 +169,8 @@ class _AccountsPageState extends State<AllAccounts> {
                                 );
                               }):
                                   Navigator.push(context,
-                                      MaterialPageRoute(builder: (context) => EditAccount(record.account.toString(),data.documentID),fullscreenDialog: true));
+                                      MaterialPageRoute(builder: (context) => EditAccount(
+                                          userAddress,data.documentID),fullscreenDialog: true));
                             },
                             ),
                       ],
@@ -169,8 +183,22 @@ class _AccountsPageState extends State<AllAccounts> {
               subtitle: Text('${(record.accountType)}'),
 
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => AllTransactions(record.account),
-                  fullscreenDialog: true));
+
+              showDialog(
+              context: context,
+              builder:  (BuildContext context) {
+                return AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15)
+                  ),
+                  title: Text('Transactions'),
+                  content: AllTransactions(userAddress, data.documentID),
+                  );
+              });
+
+//              Navigator.push(context, MaterialPageRoute(builder: (context) =>
+//                  ShowTransactions(userAddress,data.documentID),
+//                  fullscreenDialog: true));
             }
         ),
       )
