@@ -38,6 +38,9 @@ dependencies:
   flutter_rounded_date_picker: ^1.0.4
   animator: ^1.0.0+5
   simple_animations: ^1.3.11
+  pie_chart: ^3.1.1
+  fl_chart: ^0.8.7
+  syncfusion_flutter_charts: ^18.1.43
 
 dev_dependencies:
   flutter_test:
