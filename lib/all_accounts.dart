@@ -5,7 +5,7 @@ import 'newTransaction.dart';
 import 'showTransactions.dart';
 
 class Accounts extends StatelessWidget {
-  String userAddress;
+  final String userAddress;
   Accounts(this.userAddress);
 
   @override
@@ -17,7 +17,7 @@ class Accounts extends StatelessWidget {
 }
 
 class AllAccounts extends StatefulWidget {
-  String userAddress;
+  final String userAddress;
 
   AllAccounts(this.userAddress);
 
@@ -39,10 +39,7 @@ class _AccountsPageState extends State<AllAccounts> {
   }
 
   Widget _buildBody(BuildContext context) {
-
     return StreamBuilder<QuerySnapshot>(
-//Firestore.instance.collection('Users').document(DocumentReference).collection('allAccounts').snapshots()
-
       stream: Firestore.instance.collection(userAddress).snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData)
