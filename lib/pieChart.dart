@@ -41,7 +41,7 @@ class _PieChartState extends State<PieChart> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: GradientAppBar(title: Text('Pie chart',style: TextStyle(
+      appBar: GradientAppBar(title: Text('All Transactions',style: TextStyle(
           fontWeight: FontWeight.bold,fontSize: 22
       ),),
         gradient: LinearGradient(
