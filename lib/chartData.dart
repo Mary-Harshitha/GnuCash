@@ -3,7 +3,7 @@ class FireData {
   final String account;
   FireData(this.amount,this.account);
 
-  FireData.fromMap(Map<String, dynamic> map)
+  FireData.fromMap(Map<dynamic, dynamic> map)
       : assert(map['account'] != null),
         assert(map['money'] != null),
         account = map['account'],
