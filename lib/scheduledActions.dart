@@ -137,7 +137,7 @@ class _ScheduleState extends State<Schedule> {
                         )),
                       ],),
                       onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => Reports()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => Reports('')));
                       },
                     ),
                     Divider(
