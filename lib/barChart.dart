@@ -42,7 +42,7 @@ class _BarChartState extends State<BarChart> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: GradientAppBar(title: Text('Bar chart',style: TextStyle(
+      appBar: GradientAppBar(title: Text('All Transactions',style: TextStyle(
           fontWeight: FontWeight.bold,fontSize: 22
       ),),
         gradient: LinearGradient(
