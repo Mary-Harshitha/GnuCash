@@ -13,27 +13,27 @@ class MyApp extends StatefulWidget{
 
 class _AppState extends State<MyApp> {
 
-  Future checkFirstSeen() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool _seen = (prefs.getBool('seen') ?? false);
+  // Future checkFirstSeen() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   bool _seen = (prefs.getBool('seen') ?? false);
 
-    if (_seen) {
-      Navigator.of(context).pushReplacement(
-           MaterialPageRoute(builder: (context) => Splash()));
-    } else {
-      await prefs.setBool('seen', true);
-      Navigator.of(context).pushReplacement(
-           MaterialPageRoute(builder: (context) => Intro()));
-    }
-  }
+  //   if (_seen) {
+  //     Navigator.of(context).pushReplacement(
+  //          MaterialPageRoute(builder: (context) => Splash()));
+  //   } else {
+  //     await prefs.setBool('seen', true);
+  //     Navigator.of(context).pushReplacement(
+  //          MaterialPageRoute(builder: (context) => Intro()));
+  //   }
+  // }
 
-  @override
-  void initState() {
-    super.initState();
-    Timer(Duration(milliseconds: 200), () {
-      checkFirstSeen();
-    });
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   Timer(Duration(milliseconds: 200), () {
+  //     checkFirstSeen();
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
