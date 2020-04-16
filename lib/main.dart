@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'appIntro.dart';
+import 'package:gnu_cash/appIntro.dart';
 import 'home.dart';
 import 'splashScreen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:async';
 
 void main() => runApp(MyApp());
 
@@ -49,5 +47,6 @@ class _AppState extends State<MyApp> {
       home: Splash(),
     );
   }
+  
 }
 
