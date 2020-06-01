@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gnu_cash/appIntro.dart';
 import 'home.dart';
+import 'package:gnu_cash/run_main.dart';
 import 'splashScreen.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(RunApp());
 
 class MyApp extends StatefulWidget{
   _AppState createState() => _AppState();
