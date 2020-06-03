@@ -97,6 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            CircleAvatar(child: Text('YESSSSSSS'),),
             Text(
               'You have pushed the button this many times:',
             ),
