@@ -1,5 +1,5 @@
 import 'package:gnu_cash/validator.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Unit test, ', (){
@@ -15,7 +15,7 @@ void main() {
       var result = FieldValidator.ValidatePassword('');
       expect(result, 'Enter a password');
     });
-    test('min password character test', (){
+    test('password minimum character test', (){
       var result = FieldValidator.ValidatePassword('gggg');
       expect(result, 'Password of atleast 6 characters');
     });
