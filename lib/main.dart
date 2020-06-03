@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:gnu_cash/user.dart';
 void main() {
   runApp(MyApp());
 }
@@ -104,6 +104,9 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),
+            RaisedButton(onPressed: (){
+              Navigator.push(context,MaterialPageRoute(builder: (context) => User(),fullscreenDialog: true));
+            },child: Icon(Icons.arrow_forward),)
           ],
         ),
       ),
