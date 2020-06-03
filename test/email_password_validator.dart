@@ -1,5 +1,5 @@
 import 'package:gnu_cash/validator.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Unit test, ', (){
